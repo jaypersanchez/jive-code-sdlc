@@ -1,0 +1,45 @@
+@startuml
+title Jive-Code SDLC – Logic-First Flow (Activity)
+
+start
+:0) Intake\nCreate **Intent Brief**\n(architecture/intent.md);
+
+:1) Solution Architecture\nContext + Capability Sketch\n(sa/overview.md, sa/context-diagram.mmd);
+
+:2) Technical Architecture\nRuntime + Interfaces + NFRs\n(ta/runtime.mmd, ta/interfaces.yml);
+
+if (Data changes or governance impact?) then (Yes)
+  :3) Data Architecture\nSchemas + Migrations + Lineage\n(da/schemas.yaml|sql, da/lineage.mmd);
+else (No)
+endif
+
+repeat
+  :4) Logic Mapping\nBreak work into **Logic Nodes** L-###\n(logic/L-XXX.md, logic/flows/*.mmd);
+
+  :5) Implementation Planning\nMap L-### → files/modules\n(implementation/code-map.yml, module-plan.md);
+
+  :Gate A – Reasoning Review\nPeers reconstruct logic from artifacts?;
+repeat while (Not Clear/Approved?) is (Yes) not (No)
+
+repeat
+  :6) Build\nTraceable branches/commits\n`feat/L-###-desc`\ncommit footer: `Logic: L-###`;
+  
+  :7) Proof-of-Logic Tests\nUnit/Integration mapped to L-###\n(tests/matrix.csv, *.L###.test.*);
+  
+  :Gate B – Test Coverage\nDo tests prove the logic + edge cases?;
+repeat while (Tests insufficient?) is (Yes) not (No)
+
+:8) Review – Explain-Before-Merge\nPR template links to Intent + L-###\nReviewer speaks back logic;
+
+if (Approved?) then (Yes)
+  :9) Release\nRunbook, flags, dashboards\n(ops/runbook.md, ops/dashboards.md);
+  
+  :10) Retro\nLearning notes, tighten templates\n(learning/retro.md);
+  
+  stop
+else (Changes requested)
+  :Refine logic or code\nBack to step 4 or 6 as needed;
+  stop
+endif
+
+@enduml

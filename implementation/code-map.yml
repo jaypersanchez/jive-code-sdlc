@@ -1,0 +1,9 @@
+L-001:
+  repo:
+    docs:
+      - architecture/intent.md
+      - logic/L-001.md
+      - JIVE-CODE-SDLC.md
+  tests:
+    - tests/matrix.csv
+ 

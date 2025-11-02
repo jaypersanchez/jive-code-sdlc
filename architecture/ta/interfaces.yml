@@ -1,0 +1,17 @@
+services:
+  auth:
+    endpoints:
+      POST /v1/auth/login:
+        request: LoginRequest
+        response: LoginResponse
+        errors: [InvalidCredentials, RateLimited]
+contracts:
+  LoginRequest:
+    email: string
+    password: string
+  LoginResponse:
+    token: string
+    expiresIn: int
+nfr:
+  latency_p95_ms: 150
+  availability_slo: "99.9%"

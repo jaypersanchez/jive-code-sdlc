@@ -1,0 +1,30 @@
+name: Logic Link Check
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  verify-logic-link:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commits for "Logic: L-###"
+        if: github.event_name == 'push'
+        run: |
+          GIT_RANGE="$(git rev-parse HEAD~10)..HEAD" || true
+          git log --pretty=format:%B $GIT_RANGE | grep -E "Logic:\s*L-[0-9]{3}" || {
+            echo "::error title=Missing Logic Link::At least one commit in the last 10 must include 'Logic: L-###'"; exit 1; }
+
+      - name: Check PR title/body for "Logic: L-###"
+        if: github.event_name == 'pull_request'
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          echo "$TITLE"$'\n'"$BODY" | grep -E "L-[0-9]{3}" || {
+            echo "::error title=Missing Logic Link::PR must reference a logic node (e.g., L-001)"; exit 1; }

@@ -1,0 +1,42 @@
+@startuml
+title Jive-Code SDLC – Roles & Hand-offs (Sequence)
+
+actor PO as "Product/Owner"
+participant SA as "Solution Architect"
+participant TA as "Technical Architect"
+participant DA as "Data Architect"
+participant DEV as "Developers"
+participant REV as "Reviewer(s)"
+participant CI as "CI / Actions"
+
+PO -> SA: Intent (problem, goals, constraints)\narchitecture/intent.md
+SA -> TA: Context & capabilities\nsa/overview.md, sa/context-diagram.mmd
+TA -> DA: (if data impact) request contracts + lineage
+DA -> TA: schemas.sql|yaml, migrations, lineage.mmd
+
+TA -> DEV: interfaces.yml, runtime.mmd, NFRs
+SA -> DEV: logic framing + acceptance criteria
+DEV -> DEV: Create Logic Nodes L-###\nlogic/L-XXX.md, code-map.yml
+
+DEV -> REV: Gate A – Reasoning Review\n(explain logic from artifacts)
+REV -> DEV: approve / request changes
+
+loop Build & Test
+  DEV -> CI: push branch feat/L-###-desc\ncommit footer "Logic: L-###"
+  CI -> DEV: check logic link present
+  DEV -> DEV: implement + tests (*.L###.test.*)
+  DEV -> CI: run tests, coverage by L-###
+end
+
+DEV -> REV: PR (Explain-Before-Merge)\nlinks to Intent + L-### + diagrams
+REV -> DEV: Approve / Changes
+REV -> PO: Status & blast radius
+
+alt Approved
+  DEV -> PO: Release\nops/runbook.md, dashboards.md
+  DEV -> DEV: Retro notes (learning/retro.md)
+else Changes
+  REV -> DEV: tighten design/tests
+  DEV -> DEV: loop back (logic/design/build)
+end
+@enduml
